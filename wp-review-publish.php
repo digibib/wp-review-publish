@@ -210,7 +210,7 @@ function process_book_review_fields( $book_review_id, $book_review ) {
 		include_once( ABSPATH . WPINC. '/class-http.php' );
 	}
 	$request = new WP_Http;
-	$url = 'https://deichman3.deichman.no/api/reviews';
+	$url = 'https://anbefalinger.deichman.no/api/reviews';
 
 	// Check if all parameters are present:
 	// required: text, teaser, author, (review)title, audience
@@ -279,7 +279,7 @@ function remove_rdf ( $id ) {
 	if ( empty( $uri ) )
 		return;
 
-	$url = 'https://deichman3.deichman.no/api/reviews';
+	$url = 'https://anbefalinger.deichman.no/api/reviews';
 	$post_data = array (
 		"uri" => $uri,
 		"api_key" => get_option( 'deichman_api_key' )
