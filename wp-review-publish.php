@@ -210,7 +210,7 @@ function process_book_review_fields( $book_review_id, $book_review ) {
 		include_once( ABSPATH . WPINC. '/class-http.php' );
 	}
 	$request = new WP_Http;
-	$url = 'http://marc2rdf.deichman.no/api/reviews';
+	$url = 'https://deichman3.deichman.no/api/reviews';
 
 	// Check if all parameters are present:
 	// required: text, teaser, author, (review)title, audience
@@ -242,7 +242,7 @@ function process_book_review_fields( $book_review_id, $book_review ) {
 		$body["isbn"] = get_post_meta( $book_review_id, 'book_isbn', true );
 		$body = json_encode( $body );
 		$result = $request->request( $url,
-									 array( 'method' => 'POST', 'body' => $body ) );
+									 array( 'method' => 'POST', 'body' => $body, 'headers' => array( 'Content-Type' => 'application/json' ) ) );
 		if ( $result["response"]["code"] != 201 ) {
 			 $_SESSION['my_admin_notices'] .= '<div class="error"><p>Bokanbefaling push feilet fordi:</p><p>'. $result["body"] .'</p></div>';
 			 return false;
@@ -262,7 +262,7 @@ function process_book_review_fields( $book_review_id, $book_review ) {
 		// perform PUT
 		$body = json_encode( $body );
 		$result = $request->request( $url,
-									 array( 'method' => 'PUT', 'body' => $body ) );
+									 array( 'method' => 'PUT', 'body' => $body, 'headers' => array( 'Content-Type' => 'application/json' )  ) );
 		if ( $result["response"]["code"] != 200 ) {
 			$_SESSION['my_admin_notices'] .= '<div class="error"><p>Bokanbefaling opdatering feilet fordi:</p><p>'. $result["body"] .'</p></div>';
 		} else {
@@ -279,7 +279,7 @@ function remove_rdf ( $id ) {
 	if ( empty( $uri ) )
 		return;
 
-	$url = 'http://marc2rdf.deichman.no/api/reviews';
+	$url = 'https://deichman3.deichman.no/api/reviews';
 	$post_data = array (
 		"uri" => $uri,
 		"api_key" => get_option( 'deichman_api_key' )
@@ -288,8 +288,9 @@ function remove_rdf ( $id ) {
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Content-Type: application/json' ) );
 	// adding the post variables to the request
-	curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);
+	curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($post_data));
 	$result = curl_exec($ch);
 	curl_close($ch);
 
